@@ -41,18 +41,19 @@ if arquivos_anexados:
                 df_geral = df_novo
 
             # 3. Remoção de Duplicatas (Mantém sempre a atualização mais recente do mesmo ID)
-            df = df_geral.drop_duplicates(subset=['Id'], keep='last').copy()
-
-            # Converter colunas de data
-            df['Data de início da inscrição'] = pd.to_datetime(df['Data de início da inscrição'])
-            df['Data de finalização da inscrição'] = pd.to_datetime(df['Data de finalização da inscrição'])
+            # 3. Converter colunas de data PRIMEIRO (usando o df_geral)
+            df_geral['Data de início da inscrição'] = pd.to_datetime(df_geral['Data de início da inscrição'])
+            df_geral['Data de finalização da inscrição'] = pd.to_datetime(df_geral['Data de finalização da inscrição'])
 
             # ==========================================
             # TRATAMENTO DE DADOS (REGRAS DE NEGÓCIO)
             # ==========================================
             
             # PONTO 1: Regra do Ano do Evento (+1)
-            df['Ano do Evento'] = df['Data de início da inscrição'].dt.year + 1
+            df_geral['Ano do Evento'] = df_geral['Data de início da inscrição'].dt.year + 1
+
+            # 4. Remoção de Duplicatas (Agora com ID e Ano do Evento juntos)
+            df = df_geral.drop_duplicates(subset=['Id', 'Ano do Evento'], keep='last').copy()
 
             # PONTO 2: Dia Relativo de Inscrição
             datas_inicio_campanha = {
